@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ravi-devops-service
+  namespace: ravi-devops
+spec:
+  type: LoadBalancer
+  selector:
+    app: ravi-devops-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
