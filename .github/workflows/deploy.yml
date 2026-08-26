@@ -9,6 +9,7 @@ env:
   AWS_REGION: ap-south-1
   ECR_REPOSITORY: ravi-devops-app
   EKS_CLUSTER_NAME: ravi-eks-cluster
+  K8S_NAMESPACE: ravi-devops
 
 jobs:
   build-and-deploy:
@@ -49,13 +50,23 @@ jobs:
           --region $AWS_REGION \
           --name $EKS_CLUSTER_NAME
 
-      - name: Deploy to Amazon EKS
+      - name: Create Kubernetes namespace
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+
+      - name: Deploy Kubernetes resources
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+
+      - name: Update deployment image
         run: |
           kubectl set image deployment/ravi-devops-app \
           ravi-devops-app=${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }} \
-          -n ravi-devops
+          -n $K8S_NAMESPACE
 
       - name: Verify deployment
         run: |
-          kubectl rollout status deployment/ravi-devops-app -n ravi-devops
-          kubectl get pods -n ravi-devops
+          kubectl rollout status deployment/ravi-devops-app -n $K8S_NAMESPACE
+          kubectl get pods -n $K8S_NAMESPACE
+          kubectl get svc -n $K8S_NAMESPACE
