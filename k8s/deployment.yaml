@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ravi-devops-app
+  namespace: ravi-devops
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ravi-devops-app
+  template:
+    metadata:
+      labels:
+        app: ravi-devops-app
+    spec:
+      containers:
+        - name: ravi-devops-app
+          image: PLACEHOLDER_IMAGE
+          ports:
+            - containerPort: 80
